@@ -150,7 +150,36 @@ print(AUTmap.head(50))
 ###########################
 
 
+#SEBASTIAN 
 
+for u in range(0, len(gdf), 10000):
+    u_tmp = u+10000-1
+    if u_tmp > len(gdf):
+        u_tmp = len(gdf)
+    gdf_tmp = gdf[u:u_tmp]
+    AUTmap_tmp = AUTmap
+
+    Points = gdf_tmp.geometry
+    tree = STRtree(Points)
+
+    AUTmap_tmp['IndexListe'] = np.empty((len(AUTmap_tmp), 0)).tolist()
+
+
+    i = 0
+    for p in AUTmap_tmp.geometry:
+
+        res = [x for x in tree.query(p) if p.contains(x)]
+        #res = tree.query(p)   
+        if len(res) >= 1:
+                var = gdf_tmp[gdf_tmp.isin(res).any(axis=1)]
+                AUTmap_tmp.loc[i, 'IndexListe'].append(var.index.tolist())
+
+
+        i = i+1
+    
+    AUTmap_tmp.to_csv("Daten_Raster_Punkte/points_rtr"+ str(u) +".csv")
+    print(str(u)+" printed")
+    
 
 
 
